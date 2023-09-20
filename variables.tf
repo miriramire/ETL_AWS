@@ -7,7 +7,6 @@ variable "s3_bucket_landing" {
     jobs = string
     tranformed = string
     python_code = string
-    etl = string
   })
 
   default = {
@@ -17,6 +16,17 @@ variable "s3_bucket_landing" {
     jobs        = "jobs"
     tranformed  = "transformed"
     python_code = "python"
-    etl = "etl.py"
   }
+}
+
+variable "file-name" {
+  default = "etl.py"
+}
+
+variable "job-name" {
+  default = "load-data-to-redshift"
+}
+
+variable "job-language" {
+  default = "python"
 }
