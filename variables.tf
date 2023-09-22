@@ -14,9 +14,32 @@ variable "s3_bucket_landing" {
     employees   = "employees"
     departments = "departments"
     jobs        = "jobs"
-    tranformed  = "transformed"
     python_code = "python"
   }
+}
+
+###################################################
+#         LAMBDA VARIABLES
+###################################################
+
+variable "lambda" {
+  description = "Lambda details"
+  type = object({
+    source_file = string
+    function_name = string
+    handler = string
+    lambda_zip_location = string
+    runtime = string
+  })
+
+  default = {
+    source_file = "lambdafunc.py"
+    function_name = "lambdafunc"
+    handler = "lambdafunc.lambda_handler"
+    lambda_zip_location = "outputs/lambdafunc.zip"
+    runtime = "python3.10"
+  }
+  
 }
 
 variable "file-name" {
