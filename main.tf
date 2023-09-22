@@ -15,7 +15,6 @@ resource "aws_s3_bucket_notification" "s3_event_trigger" {
   lambda_function {
     lambda_function_arn = aws_lambda_function.s3_transform_function.arn
     events             = ["s3:ObjectCreated:*"]
-    filter_prefix      = "${var.s3_bucket_landing.input}"
-    filter_suffix      = ""
+    filter_suffix      = ".xlsx"
   }
 }
