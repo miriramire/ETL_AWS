@@ -5,7 +5,6 @@ variable "s3_bucket_landing" {
     employees   = string
     departments  = string
     jobs = string
-    tranformed = string
     python_code = string
   })
 
