@@ -10,22 +10,22 @@ module "s3_bucket_landing" {
 }
 
 resource "aws_s3_object" "employees_folder" {
-  bucket = var.s3_bucket_landing.name
+  bucket = module.s3_bucket_landing.s3_bucket_id
   key    = "${var.s3_bucket_landing.employees}/"
 }
 
 resource "aws_s3_object" "departments_folder" {
-  bucket = var.s3_bucket_landing.name
+  bucket = module.s3_bucket_landing.s3_bucket_id
   key    = "${var.s3_bucket_landing.departments}/"
 }
 
 resource "aws_s3_object" "jobs_folder" {
-  bucket = var.s3_bucket_landing.name
+  bucket = module.s3_bucket_landing.s3_bucket_id
   key    = "${var.s3_bucket_landing.jobs}/"
 }
 
 resource "aws_s3_object" "python_code_folder" {
-  bucket = var.s3_bucket_landing.name
+  bucket = module.s3_bucket_landing.s3_bucket_id
   key    = "${var.s3_bucket_landing.python_code}/"
 }
 
