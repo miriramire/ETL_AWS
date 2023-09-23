@@ -1,7 +1,7 @@
 locals {
   layer_zip_path    = "layer.zip"
   layer_name        = "my_lambda_requirements_layer"
-  requirements_path = "requirements.txt"
+  requirements_path = "${path.root}/../requirements.txt"
 }
 
 # create zip file from requirements.txt. Triggers only when the file is updated
@@ -12,7 +12,6 @@ resource "null_resource" "lambda_layer" {
     # the command to install python and dependencies to the machine and zips
     provisioner "local-exec" {
         command = <<EOT
-            set -e
             apt-get update
             apt install python3 python3-pip zip -y
             rm -rf python
