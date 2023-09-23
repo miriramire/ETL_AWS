@@ -15,7 +15,6 @@ resource "null_resource" "lambda_layer" {
             rm -rf python
             mkdir python
             pip3 install -r ${local.requirements_path} -t python/
-            zip -r ${local.layer_zip_path} python/
         EOT
     }
 }
