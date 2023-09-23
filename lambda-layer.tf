@@ -20,12 +20,12 @@ resource "null_resource" "lambda_layer" {
 }
 
 # upload zip file to s3
-resource "aws_s3_object" "lambda_layer_zip" {
-  bucket = module.s3_bucket_landing.s3_bucket_id
-  key = "${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
-  source = local.layer_zip_path
-  depends_on = [null_resource.lambda_layer]
-}
+#resource "aws_s3_object" "lambda_layer_zip" {
+#  bucket = module.s3_bucket_landing.s3_bucket_id
+#  key = "${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
+#  source = local.layer_zip_path
+#  depends_on = [null_resource.lambda_layer]
+#}
 
 # create lambda layer from s3 object
 resource "aws_lambda_layer_version" "my-lambda-layer" {
