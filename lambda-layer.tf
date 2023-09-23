@@ -11,21 +11,24 @@ resource "null_resource" "lambda_layer" {
     }
     # the command to install python and dependencies to the machine and zips
     provisioner "local-exec" {
-        command = <<EOT
-            rm -rf python
-            mkdir python
-            pip3 install -r ${local.requirements_path} -t python/
-        EOT
+      command = <<EOT
+        rm -rf python
+        mkdir python
+        pip3 install -r ${local.requirements_path} -t python/
+      EOT
     }
+    provisioner "local-exec" {
+      command = "zip -r ${local.layer_zip_path} python/"
+  }
 }
 
 # upload zip file to s3
-#resource "aws_s3_object" "lambda_layer_zip" {
-#  bucket = module.s3_bucket_landing.s3_bucket_id
-#  key = "${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
-#  source = local.layer_zip_path
-#  depends_on = [null_resource.lambda_layer]
-#}
+resource "aws_s3_object" "lambda_layer_zip" {
+  bucket = module.s3_bucket_landing.s3_bucket_id
+  key = "${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
+  source = local.layer_zip_path
+  depends_on = [null_resource.lambda_layer]
+}
 
 # create lambda layer from s3 object
 resource "aws_lambda_layer_version" "my-lambda-layer" {
