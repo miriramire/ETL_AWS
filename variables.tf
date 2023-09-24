@@ -9,11 +9,12 @@ variable "s3_bucket_landing" {
   })
 
   default = {
-    name        = "landing-globant-data-terraform-project-101"
-    employees   = "employees"
-    departments = "departments"
-    jobs        = "jobs"
-    python_code = "python"
+    name                = "landing-globant-data-terraform-project-101"
+    employees           = "employees"
+    departments         = "departments"
+    jobs                = "jobs"
+    python_code         = "python"
+    temporary_directory = "glue-temporary-directory"
   }
 }
 
@@ -46,9 +47,34 @@ variable "file-name" {
 }
 
 variable "job-name" {
-  default = "load-data-to-redshift"
+  default = "load-data-to-snowflake"
 }
 
 variable "job-language" {
-  default = "python"
+  default = "pythonPython 3"
+}
+
+variable "glue_jar" {
+  description = ".jar location"
+  type = object({
+    jdbc = string
+    spark = string
+  })
+  default = {
+    jdbc = "snowflake-jdbc-3.14.1.jar"
+    spark = "spark-snowflake_2.13-2.12.0-spark_3.4"
+  }
+}
+
+
+variable "jar_location" {
+  description = ".jar location"
+  type = object({
+    jdbc = string
+    spark = string
+  })
+  default = {
+    jdbc = "${var.s3_bucket_landing.python_code}/${var.glue_jar.jdbc}"
+    spark = "${var.s3_bucket_landing.python_code}/${var.glue_jar.spark}"
+  }
 }

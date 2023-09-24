@@ -1,28 +1,35 @@
+import sys
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
+from awsglue.job import Job
+from py4j.java_gateway import java_import
 
-# Initialize SparkContext and GlueContext
+## @params: [JOB_NAME, URL, WAREHOUSE, DB, SCHEMA, USERNAME, PASSWORD]
+SNOWFLAKE_SOURCE_NAME = "net.snowflake.spark.snowflake"
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'URL', 'WAREHOUSE', 'DB', 'SCHEMA', 'USERNAME', 'PASSWORD'])
 sc = SparkContext()
 glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+job = Job(glueContext)
+job.init(args['JOB_NAME'], args)
+java_import(spark._jvm, SNOWFLAKE_SOURCE_NAME)
+## uj = sc._jvm.net.snowflake.spark.snowflake
+spark._jvm.net.snowflake.spark.snowflake.SnowflakeConnectorUtils.enablePushdownSession(spark._jvm.org.apache.spark.sql.SparkSession.builder().getOrCreate())
+sfOptions = {
+"sfURL" : args['URL'],
 
-db_name = "globant"
-tbl_employees = "employees"
-tbl_departments = "departments"
-tbl_jobs = "jobs"
+"sfUser" : args['USERNAME'],
+"sfPassword" : args['PASSWORD'],
+"sfDatabase" : args['DB'],
+"sfSchema" : args['SCHEMA'],
+"sfWarehouse" : args['WAREHOUSE'],
+"application" : "AWSGlue"
+}
 
-# Output directories
-s3_directory = "landing-globant-data-terraform-project-101"
-transformed_data = "transformed"
-output_employees = f"{s3_directory}/{transformed_data}/{tbl_employees}"
-output_departments = f"{s3_directory}/{transformed_data}/{tbl_departments}"
-output_jobs = f"{s3_directory}/{transformed_data}/{tbl_jobs}"
+## Read from a Snowflake table into a Spark Data Frame
+df = spark.read.format(SNOWFLAKE_SOURCE_NAME).options(**sfOptions).option("dbtable", "[table_name]").load()
 
-# Dynamic frames creation 
-employees = glueContext.create_dynamic_frame.from_catalog(database=db_name, table_name=tbl_employees)
-departments = glueContext.create_dynamic_frame.from_catalog(database=db_name, table_name=tbl_departments)
-jobs = glueContext.create_dynamic_frame.from_catalog(database=db_name, table_name=tbl_jobs)
-
-# Write the transformed data to the specified S3 paths
-employees.write.format('parquet').save(output_employees)
-departments.write.format('parquet').save(output_departments)
-jobs.write.format('parquet').save(output_jobs)
+## Perform any kind of transformations on your data and save as a new Data Frame: df1 = df.[Insert any filter, transformation, or other operation]
+## Write the Data Frame contents back to Snowflake in a new table df1.write.format(SNOWFLAKE_SOURCE_NAME).options(**sfOptions).option("dbtable", "[new_table_name]").mode("overwrite").save() job.commit()

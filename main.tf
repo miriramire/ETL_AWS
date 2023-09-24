@@ -1,10 +1,22 @@
 ###################################################
-# Upload etl.py code to S3 bucket
+# Upload etl.py, JDBCS, and spark connector to S3 bucket
 ###################################################
 resource "aws_s3_object" "upload-glue-script" {
-  bucket = "${var.s3_bucket_landing.name}"
+  bucket = "${module.s3_bucket_landing.s3_bucket_id}"
   key = "${var.s3_bucket_landing.python_code}/${var.file-name}"
   source = "${var.file-name}"
+}
+
+resource "aws_s3_object" "upload-snowflake-jdbc" {
+  bucket = "${module.s3_bucket_landing.s3_bucket_id}"
+  key    = "${var.jar_location.jdbc}"
+  source = "${var.glue_jar.jdbc}"
+}
+
+resource "aws_s3_object" "upload-snowflake-spark-connector" {
+  bucket = "${module.s3_bucket_landing.s3_bucket_id}"
+  key    = "${var.jar_location.spark}"
+  source = "${var.glue_jar.spark}"
 }
 
 ###################################################

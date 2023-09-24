@@ -1,51 +1,66 @@
-# IAM policy for the Glue role, granting necessary permissions.
-data "aws_iam_policy_document" "glue_policy" {
-    statement {
-        effect = "Allow"
-        actions = [
-            "s3:ListBucket",
-            "s3:GetObject",
-            "s3:PutObject"
-        ]
-        resources = [
-            "arn:aws:sqs:*:*:${var.s3_bucket_landing.name}",
-            "arn:aws:sqs:*:*:${var.s3_bucket_landing.name}/*"
-        ]
+###################################################
+#         IAM
+###################################################
+data "aws_iam_policy_document" "glue_policy_document" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["glue.amazonaws.com"]
+      type        = "Service"
     }
-    statement {
-        effect = "Allow"
-        actions = [ 
-            "glue:CreateDatabase",
-            "glue:CreateTable",
-            "glue:BatchCreatePartition" 
-        ]
-        resources = [ "*" ]
-    }
+  }
 }
 
-resource "aws_iam_role" "glue_role" {
-  name = "glue-role"
-  assume_role_policy = jsonencode({
-    "Version" = "2012-10-17",
-    "Statement" = [
-      {
-        "Effect" = "Allow",
-        "Principal" = {
-          "Service" = "glue.amazonaws.com"
-        },
-        "Action" = "sts:AssumeRole"
-      }
+data "aws_iam_policy_document" "s3_policy_document" {
+  statement {
+    effect  = "Allow"
+    actions = ["s3:*"]
+    resources = [
+      module.s3_bucket_landing.s3_bucket_arn,
+      "${module.s3_bucket_landing.s3_bucket_arn}/*"
     ]
-  })
+  }
 }
+
+resource "aws_iam_role" "glue_service_role" {
+  name               = "glue-service-role"
+  assume_role_policy = data.aws_iam_policy_document.glue_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_service_role_policy_attachment" {
+    role       = aws_iam_role.glue_service_role.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+resource "aws_iam_role_policy" "glue_service_role_policy" {
+  name   = "glue-service-role-policy"
+  policy = data.aws_iam_policy_document.s3_policy_document.json
+  role   = aws_iam_role.glue_service_role.id
+}
+
+###################################################
+#         GLUE
+###################################################
 
 resource "aws_glue_job" "glue_data_transformation_job" {
-  name     = "data-transformation-job"
-  role_arn = aws_iam_role.glue_role.arn
+  name              = "data-ingestion-job"
+  role_arn          = aws_iam_role.glue_service_role.arn
+  glue_version      = "3.0"
+  python_version    = var.job-language
+  number_of_workers = 1
+  worker_type       = "G.1X"
+  max_retries       = "1"
+  timeout           = 2880
 
   command {
     name    = "glueetl"
     python_version = "3"
-    script_location = "s3://${var.s3_bucket_landing.name}/${var.s3_bucket_landing.python_code}/etl.py"
+    script_location = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.python_code}/etl.py"
+  }
+  default_arguments = {
+    "--TempDir"                           = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.temporary_directory}"
+    "--enable-continuous-cloudwatch-log"  = "true"
+    "--enable-metrics"                    = "true"
+    "--extra-jars"                        = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.jar_location.spark},s3://${module.s3_bucket_landing.s3_bucket_id}/${var.jar_location.jdbc}"
   }
 }
