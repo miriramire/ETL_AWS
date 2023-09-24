@@ -18,6 +18,13 @@ resource "null_resource" "lambda_layer" {
         pip3 install -r ${local.requirements_path} -t python/
       EOT
     }
+    provisioner "local-exec" {
+      command = "zip -r ${local.layer_zip_path} python/"
+    }
+
+    provisioner "local-exec" {
+      command = "aws s3 cp layer.zip s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
+    }
 }
 
 # upload zip file to s3
