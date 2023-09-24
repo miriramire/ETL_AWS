@@ -14,7 +14,7 @@ resource "aws_lambda_function" "s3_transform_function" {
   role          = "${aws_iam_role.lambda_role.arn}"
   source_code_hash = filebase64sha256("${var.lambda.lambda_zip_location}")
 
-  layer = [aws_lambda_layer_version.my-lambda-layer.arn]
+  layers = [aws_lambda_layer_version.my-lambda-layer.arn]
 }
 
 resource "aws_lambda_permission" "test" {
