@@ -7,7 +7,7 @@ locals {
 data "archive_file" "requirements" {
     type = "zip"
     source_file = "${local.requirements_path}"
-    output_path = "${local.layer.zip}"
+    output_path = "${local.layer_zip_path}"
 }
 
 # create zip file from requirements.txt. Triggers only when the file is updated
