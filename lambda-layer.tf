@@ -11,6 +11,10 @@ resource "null_resource" "lambda_layer" {
         always_run = "${timestamp()}"
     }
     # the command to install python and dependencies to the machine and zips
+
+    provisioner "local-exec" {
+      command = "apt install zip -y"
+    }
     provisioner "local-exec" {
       command = <<EOT
         rm -rf python
