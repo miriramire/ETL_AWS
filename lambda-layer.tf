@@ -4,6 +4,12 @@ locals {
   requirements_path = "requirements.txt"
 }
 
+data "archive_file" "requirements" {
+    type = "zip"
+    source_file = "${local.requirements_path}"
+    output_path = "${local.layer.zip}"
+}
+
 # create zip file from requirements.txt. Triggers only when the file is updated
 resource "null_resource" "lambda_layer" {
     triggers = {
@@ -13,21 +19,11 @@ resource "null_resource" "lambda_layer" {
     # the command to install python and dependencies to the machine and zips
 
     provisioner "local-exec" {
-      command = "apt install zip -y"
-    }
-    provisioner "local-exec" {
       command = <<EOT
         rm -rf python
         mkdir python
         pip3 install -r ${local.requirements_path} -t python/
       EOT
-    }
-    provisioner "local-exec" {
-      command = "zip -r ${local.layer_zip_path} python/"
-    }
-
-    provisioner "local-exec" {
-      command = "aws s3 cp layer.zip s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.python_code}/${local.layer_zip_path}"
     }
 }
 
