@@ -54,7 +54,7 @@ variable "job-name" {
 }
 
 variable "job-language" {
-  default = "Python 3"
+  default = "3"
 }
 
 variable "glue_jar" {
