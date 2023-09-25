@@ -46,7 +46,7 @@ resource "aws_glue_job" "glue_data_transformation_job" {
   name              = "data-ingestion-job"
   role_arn          = aws_iam_role.glue_service_role.arn
   glue_version      = "3.0"
-  number_of_workers = 1
+  number_of_workers = 2
   worker_type       = "G.1X"
   max_retries       = "1"
   timeout           = 2880
