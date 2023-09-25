@@ -1,11 +1,12 @@
 variable "s3_bucket_landing" {
   description = "External data will be received in input folder"
   type = object({
-    name    = string
-    employees   = string
-    departments  = string
-    jobs = string
-    python_code = string
+    name                = string
+    employees           = string
+    departments         = string
+    jobs                = string
+    python_code         = string
+    temporary_directory = string
   })
 
   default = {
@@ -30,6 +31,7 @@ variable "lambda" {
     handler = string
     lambda_zip_location = string
     runtime = string
+    pandas = string
   })
 
   default = {
@@ -38,6 +40,7 @@ variable "lambda" {
     handler = "lambdafunc.lambda_handler"
     lambda_zip_location = "outputs/lambdafunc.zip"
     runtime = "python3.10"
+    pandas = "pandas_layer.zip"
   }
   
 }
@@ -57,8 +60,9 @@ variable "job-language" {
 variable "glue_jar" {
   description = ".jar location"
   type = object({
-    jdbc = string
-    spark = string
+    folder_path = string
+    jdbc        = string
+    spark       = string
   })
   default = {
     folder_path = "glue-jar"

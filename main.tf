@@ -9,13 +9,13 @@ resource "aws_s3_object" "upload-glue-script" {
 
 resource "aws_s3_object" "upload-snowflake-jdbc" {
   bucket = "${module.s3_bucket_landing.s3_bucket_id}"
-  key    = "${var.glue_jar.folder_path}/${var.s3_bucket_landing.jdbc}"
+  key    = "${var.glue_jar.folder_path}/${var.glue_jar.jdbc}"
   source = "${var.glue_jar.jdbc}"
 }
 
 resource "aws_s3_object" "upload-snowflake-spark-connector" {
   bucket = "${module.s3_bucket_landing.s3_bucket_id}"
-  key    = "${var.glue_jar.folder_path}/${var.s3_bucket_landing.spark}"
+  key    = "${var.glue_jar.folder_path}/${var.glue_jar.spark}"
   source = "${var.glue_jar.spark}"
 }
 

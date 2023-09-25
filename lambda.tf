@@ -1,7 +1,3 @@
-locals {
-  pandas = "pandas_layer.zip"
-}
-
 data "archive_file" "lambdafunc" {
     type = "zip"
     source_file = "${var.lambda.source_file}"
