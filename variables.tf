@@ -51,7 +51,7 @@ variable "job-name" {
 }
 
 variable "job-language" {
-  default = "pythonPython 3"
+  default = "Python 3"
 }
 
 variable "glue_jar" {
@@ -61,20 +61,8 @@ variable "glue_jar" {
     spark = string
   })
   default = {
+    folder_path = "glue-jar"
     jdbc = "snowflake-jdbc-3.14.1.jar"
     spark = "spark-snowflake_2.13-2.12.0-spark_3.4"
-  }
-}
-
-
-variable "jar_location" {
-  description = ".jar location"
-  type = object({
-    jdbc = string
-    spark = string
-  })
-  default = {
-    jdbc = "${var.s3_bucket_landing.python_code}/${var.glue_jar.jdbc}"
-    spark = "${var.s3_bucket_landing.python_code}/${var.glue_jar.spark}"
   }
 }

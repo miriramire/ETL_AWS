@@ -33,3 +33,8 @@ resource "aws_s3_object" "temporary_directory" {
   bucket = module.s3_bucket_landing.s3_bucket_id
   key    = "${var.s3_bucket_landing.temporary_directory}/"
 }
+
+resource "aws_s3_object" "hlue_jar" {
+  bucket = module.s3_bucket_landing.s3_bucket_id
+  key    = "${var.glue_jar.folder_path}/"
+}

@@ -61,6 +61,6 @@ resource "aws_glue_job" "glue_data_transformation_job" {
     "--TempDir"                           = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.temporary_directory}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-metrics"                    = "true"
-    "--extra-jars"                        = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.jar_location.spark},s3://${module.s3_bucket_landing.s3_bucket_id}/${var.jar_location.jdbc}"
+    "--extra-jars"                        = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.glue_jar.folder_path}/${var.s3_bucket_landing.spark},s3://${module.glue_jar.s3_bucket_id}/${var.glue_jar.folder_path}/${var.glue_jar.jdbc}"
   }
 }
