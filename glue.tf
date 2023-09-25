@@ -46,7 +46,6 @@ resource "aws_glue_job" "glue_data_transformation_job" {
   name              = "data-ingestion-job"
   role_arn          = aws_iam_role.glue_service_role.arn
   glue_version      = "3.0"
-  python_version    = var.job-language
   number_of_workers = 1
   worker_type       = "G.1X"
   max_retries       = "1"
@@ -54,13 +53,13 @@ resource "aws_glue_job" "glue_data_transformation_job" {
 
   command {
     name    = "glueetl"
-    python_version = "3"
+    python_version = var.job-language
     script_location = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.python_code}/etl.py"
   }
   default_arguments = {
     "--TempDir"                           = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.s3_bucket_landing.temporary_directory}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-metrics"                    = "true"
-    "--extra-jars"                        = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.glue_jar.folder_path}/${var.s3_bucket_landing.spark},s3://${module.s3_bucket_landing.s3_bucket_id}/${var.glue_jar.folder_path}/${var.glue_jar.jdbc}"
+    "--extra-jars"                        = "s3://${module.s3_bucket_landing.s3_bucket_id}/${var.glue_jar.folder_path}/${var.glue_jar.spark},s3://${module.s3_bucket_landing.s3_bucket_id}/${var.glue_jar.folder_path}/${var.glue_jar.jdbc}"
   }
 }
