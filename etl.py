@@ -16,9 +16,14 @@ job = Job(glue_context)
 logger = glue_context.get_logger()
 job.init(args["JOB_NAME"], args)
 
-# secret
+# basic details
 region_name = "us-west-2"
-#client = boto3.client("scretsmanager")
+database = "globant"
+jobs_table_name = "jobs"
+departments_table_name = "departments"
+employees_table_name = "employees"
+
+# secret
 session = boto3.session.Session()
 client = session.client(
     service_name='secretsmanager',
@@ -40,14 +45,14 @@ snowflake_options = {
     "sfWarehouse": snowflake_details['sfWarehouse']
 }
 
-df = glue_context.create_dynamic_frame.from_catalog(
-    database = "jobs",
-    table_name = "jobs",
-    transformation_ctx = "source1"
-)
-new_names = ['id', 'job']
-df =df.toDF(*new_names)
-
-df.write.format("snowflake").options(**snowflake_options).option("dbtable", "JOBS").mode("overwrite").save()
+for table in [jobs_table_name, departments_table_name, employees_table_name]:
+    df = None
+    df = glue_context.create_dynamic_frame.from_catalog(
+        database = database,
+        table_name = table,
+        transformation_ctx = "source1"
+        )
+    df =df.toDF()
+    df.write.format("snowflake").options(**snowflake_options).option("dbtable", table).mode("overwrite").save()
 
 job.commit()

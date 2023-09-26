@@ -1,4 +1,6 @@
-# S3 Landing Bucket
+###################################################
+#         Landing Bucket
+###################################################
 module "s3_bucket_landing" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
@@ -39,7 +41,9 @@ resource "aws_s3_object" "hlue_jar" {
   key    = "${var.glue_jar.folder_path}/"
 }
 
-#
+###################################################
+#         Transformed files Bucket
+###################################################
 
 module "s3_bucket_landing_transformed" {
   source = "terraform-aws-modules/s3-bucket/aws"
@@ -64,4 +68,18 @@ resource "aws_s3_object" "departments_folder_transformed" {
 resource "aws_s3_object" "jobs_folder_transformed" {
   bucket = module.s3_bucket_landing_transformed.s3_bucket_id
   key    = "${var.s3_bucket_landing.jobs}/"
+}
+
+###################################################
+#         Table's backup 
+###################################################
+
+module "s3_bucket_landing_backup" {
+  source = "terraform-aws-modules/s3-bucket/aws"
+
+  bucket = "${var.s3_bucket_landing.name}-backup"
+  acl    = "private"
+
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
 }
