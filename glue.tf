@@ -15,9 +15,11 @@ data "aws_iam_policy_document" "s3_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["s3:*"]
-    resources = [
-      module.s3_bucket_landing.s3_bucket_arn,
-      "${module.s3_bucket_landing.s3_bucket_arn}/*"
+    resources = [ 
+        "arn:aws:s3:::${module.s3_bucket_landing.s3_bucket_id}/*",
+        "arn:aws:s3:::${module.s3_bucket_landing.s3_bucket_id}",
+        "arn:aws:s3:::${module.s3_bucket_landing_transformed.s3_bucket_id}/*",
+        "arn:aws:s3:::${module.s3_bucket_landing_transformed.s3_bucket_id}", 
     ]
   }
   statement {
