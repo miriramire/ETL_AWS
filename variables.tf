@@ -1,3 +1,6 @@
+###################################################
+#         Bucket VARIABLES
+###################################################
 variable "s3_bucket_landing" {
   description = "External data will be received in input folder"
   type = object({
@@ -57,6 +60,9 @@ variable "job-language" {
   default = "3"
 }
 
+###################################################
+#         Glue VARIABLES
+###################################################
 variable "glue_jar" {
   description = ".jar location"
   type = object({
