@@ -67,6 +67,6 @@ variable "glue_jar" {
   default = {
     folder_path = "glue-jar"
     jdbc = "snowflake-jdbc-3.14.1.jar"
-    spark = "spark-snowflake_2.13-2.12.0-spark_3.4"
+    spark = "spark-snowflake_2.13-2.12.0-spark_3.4.jar"
   }
 }

@@ -4,32 +4,50 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
-from py4j.java_gateway import java_import
+import boto3
+import json
+import csv
 
-## @params: [JOB_NAME, URL, WAREHOUSE, DB, SCHEMA, USERNAME, PASSWORD]
-SNOWFLAKE_SOURCE_NAME = "net.snowflake.spark.snowflake"
-args = getResolvedOptions(sys.argv, ['JOB_NAME', 'URL', 'WAREHOUSE', 'DB', 'SCHEMA', 'USERNAME', 'PASSWORD'])
+args = getResolvedOptions(sys.argv, ["JOB_NAME"])
 sc = SparkContext()
-glueContext = GlueContext(sc)
-spark = glueContext.spark_session
-job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
-java_import(spark._jvm, SNOWFLAKE_SOURCE_NAME)
-## uj = sc._jvm.net.snowflake.spark.snowflake
-spark._jvm.net.snowflake.spark.snowflake.SnowflakeConnectorUtils.enablePushdownSession(spark._jvm.org.apache.spark.sql.SparkSession.builder().getOrCreate())
-sfOptions = {
-"sfURL" : args['URL'],
+glue_context = GlueContext(sc)
+spark = glue_context.spark_session
+job = Job(glue_context)
+logger = glue_context.get_logger()
+job.init(args["JOB_NAME"], args)
 
-"sfUser" : args['USERNAME'],
-"sfPassword" : args['PASSWORD'],
-"sfDatabase" : args['DB'],
-"sfSchema" : args['SCHEMA'],
-"sfWarehouse" : args['WAREHOUSE'],
-"application" : "AWSGlue"
+# secret
+region_name = "us-west-2"
+#client = boto3.client("scretsmanager")
+session = boto3.session.Session()
+client = session.client(
+    service_name='secretsmanager',
+    region_name=region_name
+)
+secret_response = client.get_secret_value(SecretId='snowflake-secrets')
+snowflake_details = json.loads(secret_response['SecretString'])
+secret_response1 = client.get_secret_value(SecretId='snowflake_login')
+snowflake_details1 = json.loads(secret_response1['SecretString'])
+logger.info(f"snowflake_details {snowflake_details}")
+
+#snowflake connection
+snowflake_options = {
+    "sfUrl": snowflake_details['sfUrl'],
+    "sfUser": snowflake_details1['sfUser'],
+    "sfPassword": snowflake_details1['sfPassword'],
+    "sfDatabase": snowflake_details['sfDatabase'],
+    "sfSchema": snowflake_details['sfSchema'],
+    "sfWarehouse": snowflake_details['sfWarehouse']
 }
 
-## Read from a Snowflake table into a Spark Data Frame
-df = spark.read.format(SNOWFLAKE_SOURCE_NAME).options(**sfOptions).option("dbtable", "[table_name]").load()
+df = glue_context.create_dynamic_frame.from_catalog(
+    database = "jobs",
+    table_name = "jobs",
+    transformation_ctx = "source1"
+)
+new_names = ['id', 'job']
+df =df.toDF(*new_names)
 
-## Perform any kind of transformations on your data and save as a new Data Frame: df1 = df.[Insert any filter, transformation, or other operation]
-## Write the Data Frame contents back to Snowflake in a new table df1.write.format(SNOWFLAKE_SOURCE_NAME).options(**sfOptions).option("dbtable", "[new_table_name]").mode("overwrite").save() job.commit()
+df.write.format("snowflake").options(**snowflake_options).option("dbtable", "JOBS").mode("overwrite").save()
+
+job.commit()

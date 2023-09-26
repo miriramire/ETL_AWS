@@ -20,6 +20,11 @@ data "aws_iam_policy_document" "s3_policy_document" {
       "${module.s3_bucket_landing.s3_bucket_arn}/*"
     ]
   }
+  statement {
+    effect = "Allow"
+    actions = [ "secretsmanager:*" ]
+    resources = [ "*" ]
+  }
 }
 
 resource "aws_iam_role" "glue_service_role" {
