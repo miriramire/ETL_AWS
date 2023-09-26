@@ -66,7 +66,19 @@ variable "glue_jar" {
   })
   default = {
     folder_path = "glue-jar"
-    jdbc = "snowflake-jdbc-3.14.1.jar"
-    spark = "spark-snowflake_2.13-2.12.0-spark_3.4.jar"
+    jdbc = "snowflake-jdbc-3.13.30.jar"
+    spark = "spark-snowflake_2.12-2.11.0-spark_3.1.jar"
+  }
+}
+
+variable "glue_crawler" {
+  description = "Glue Crawler and database information"
+  type = object({
+    database_name = string
+    crawler_name  = string
+  })
+  default = {
+    database_name = "globant"
+    crawler_name  = "dataeng-check-employees"
   }
 }

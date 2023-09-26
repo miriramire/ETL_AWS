@@ -6,10 +6,10 @@ from datetime import datetime
 
 s3_client = boto3.client('s3')
 
-def get_excel_data(sheet) -> list:
-    #xlrd.xlsx.ensure_elementtree_imported(False, None)
-    #xlrd.xlsx.Element_has_iter = True
+def get_excel_data(sheet, header: list) -> list:
     excel_sheet = list()
+    # Append header
+    excel_sheet.append(header)
     # Iterate through rows and columns
     for row in sheet.iter_rows():
         row_data = []  # Store each row in a list
@@ -17,6 +17,16 @@ def get_excel_data(sheet) -> list:
             row_data.append(cell.value) # Append cell value to the row list
         excel_sheet.append(row_data)
     return excel_sheet
+    
+def get_excel_header(key:str) -> list:
+    if 'jobs' in key:
+        return ['id', 'job']
+    elif 'departments' in key:
+        return ['id', 'department']
+    elif 'employees' in key:
+        return ['id', 'name', 'datetime', 'department_id', 'job_id']
+    else:
+        return []
         
 
 def lambda_handler(event, context):
@@ -24,23 +34,18 @@ def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
     local_file_path = f'/tmp/{key.split("/")[-1]}'
-    print(f"key:{key}")
-    print(f"local_file_path: {local_file_path}")
     
-    # getting content as STR
-    #response = s3_client.get_object(Bucket=bucket, Key=key)
-    #print(f"response:{response}")
-    #content = response['Body'].read().decode('utf-8')
-    #print(f"content:{content}")
+    excel_header = get_excel_header(key)
+    
+    # getting content
     s3_client.download_file(bucket, key, local_file_path)
     
     # Read the .xlsx file
     workbook = load_workbook(filename=local_file_path)
     sheet = workbook.active
     
-    # Retrieve the Pandas Data
-    #excel_sheet = get_excel_data(content)
-    excel_sheet = get_excel_data(sheet)
+    # Retrieve excel data
+    excel_sheet = get_excel_data(sheet, excel_header)
     
     # Clean up the downloaded file
     os.remove(local_file_path)
