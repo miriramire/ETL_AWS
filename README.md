@@ -6,28 +6,28 @@ For the data warehouse, I have used Snowflake and Tableu to visualize the data.
 You are a data engineer at Globant and you are about to start an important project. This project
 is big data migration to a new database system. You need to create a PoC to solve the next
 requirements:
-1. Move historic data from files in CSV format to the new database.
-2. Create a Rest API service to receive new data. This service must have:
-    2.1. Each new transaction must fit the data dictionary rules.
-    2.2. Be able to insert batch transactions (1 up to 1000 rows) with one request.
-    2.3. Receive the data for each table in the same service.
-    2.4. Keep in mind the data rules for each table.
-3. Create a feature to backup for each table and save it in the file system in AVRO format.
-4. Create a feature to restore a certain table with its backup.
+_1. Move historic data from files in CSV format to the new database.__
+_2. Create a Rest API service to receive new data. This service must have:
+__2.1. Each new transaction must fit the data dictionary rules.
+__2.2. Be able to insert batch transactions (1 up to 1000 rows) with one request.
+__2.3. Receive the data for each table in the same service.
+__2.4. Keep in mind the data rules for each table.
+_3. Create a feature to backup for each table and save it in the file system in AVRO format.
+_4. Create a feature to restore a certain table with its backup.
 
 In order to achive the solution desired, I will work in AWS, where we will store our data in a `Landing` bucket. Then as soon as a `.xlsx` file is uploaded a `lambda` will be trigger and will convert `.xlsx` file into `.csv` and save it into a `Tranformed` bucket.
 Then a `crawler` will explore the `.csv` and will get the schema and will save the tables in `Glue`.
 After that a `Glue ETL` will run a `spark` script to store the data in Snowflake, and will store a `.avro` in `Backup` Bucket.
 `Glue ETL` can get the snowflake credentials and basic details from `Secrets Manager`.
 
-![Diagram](images/Globant_ETL.png)
+![Diagram](Images/Globant_ETL.png)
 
 ### For Challenge #2
 1. Number of employees hired for each job and department in 2021 divided by quarter. The table must be ordered alphabetically by department and job.
 
 In order to achive this challenge, I connected `Snowflake` with `Tableau` to be able to visualize the data.
 
-We can access to the graphic here: https://us-west-2b.online.tableau.com/#/site/globant/views/Globant/Sheet1?:iid=1
+We can access to the graphic here: [Employees Hired per Quarter 2021](https://us-west-2b.online.tableau.com/#/site/globant/views/Globant/Sheet1?:iid=1 "Employees Hired per Quarter 2021")
 
 This is the query used to extract the data, it was needed to pivot it in Tableau:
 ```sql
@@ -53,7 +53,7 @@ GROUP BY 1, 2, 3;
 
 2. List of ids, name and number of employees hired of each department that hired more employees than the mean of employees hired in 2021 for all the departments, ordered by the number of employees hired (descending).
 
-We can access to the graphic here: https://us-west-2b.online.tableau.com/#/site/globant/views/Globant/Sheet2?:iid=2
+We can access to the graphic here: [Hired Bigger Than Average](https://us-west-2b.online.tableau.com/#/site/globant/views/Globant/Sheet2?:iid=2 "Hired Bigger Than Average")
 
 This is the query used to extract the data:
 
