@@ -15,9 +15,9 @@ requirements:
 3. Create a feature to backup for each table and save it in the file system in AVRO format.
 4. Create a feature to restore a certain table with its backup.
 
-In order to achive the solution desired, I will work in AWS, where we will store our data in a `Landing` bucket. Then as soon as a `.xlsx` file is uploaded a `lambda` will be trigger and will convert `.xlsx` file into `.csv` and save it into a `Tranformed` bucket.
-Then a `crawler` will explore the `.csv` and will get the schema and will save the tables in `Glue`.
-After that a `Glue ETL` will run a `spark` script to store the data in Snowflake, and will store a `.avro` in `Backup` Bucket.
+In order to achive the solution desired, I will work in AWS, where we will store our data in a `Landing` bucket. Then as soon as a `.xlsx` file is uploaded, a `lambda` will be trigger, and will convert `.xlsx` file into `.csv`, then save it into a `Tranformed` bucket.
+After that, a `crawler` will explore the `.csv` data, and will get the schema to save the tables in `Glue`.
+Then a `Glue ETL` will run a `spark` script to store the data in Snowflake, and will store a `.avro` in `Backup` Bucket.
 `Glue ETL` can get the snowflake credentials and basic details from `Secrets Manager`.
 
 ![Diagram](Images/Globant_ETL.png)
@@ -89,4 +89,5 @@ ORDER BY HIRED DESC;
 3. Protect `PII` data, by protect it, with `SHA`, or by delete it.
 4. Add an `Schema` to the dataframes in `spark`.
 5. The queries to visualize the data can be stored as `Fact Tables`.
-6. It is possible to create a `stage` in `Snowflake` to load data directly from the `bucket` and create an `ELT` job, instead of an `ETL`.
+6. It is possible to create a [stage](https://docs.snowflake.com/en/user-guide/data-load-s3-create-stage, "Stage data in Snowflake") in `Snowflake` to load data directly from the `bucket` and create an `ELT` job, instead of an `ETL`.
+7. In order to backup `Snowflake` tables, it is possible to use [Unload data](https://docs.snowflake.com/en/user-guide/data-unload-s3, "Unload Snowflake Data")
