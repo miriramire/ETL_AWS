@@ -6,7 +6,6 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 import boto3
 import json
-import csv
 
 args = getResolvedOptions(sys.argv, ["JOB_NAME"])
 sc = SparkContext()
@@ -17,6 +16,7 @@ logger = glue_context.get_logger()
 job.init(args["JOB_NAME"], args)
 
 # basic details
+avro_output_path = "s3://landing-globant-data-terraform-project-101-backup"
 region_name = "us-west-2"
 database = "globant"
 jobs_table_name = "jobs"
@@ -53,6 +53,12 @@ for table in [jobs_table_name, departments_table_name, employees_table_name]:
         transformation_ctx = "source1"
         )
     df =df.toDF()
+    df = df.dropna()
+    
+    # Store data in snowflake
     df.write.format("snowflake").options(**snowflake_options).option("dbtable", table).mode("overwrite").save()
+
+    # Save the DataFrame in AVRO format
+    df.write.format("avro").mode("overwrite").save(f"{avro_output_path}/{table}.avro")
 
 job.commit()

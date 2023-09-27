@@ -33,7 +33,8 @@ def lambda_handler(event, context):
     # Getting Bucket name and key
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
-    local_file_path = f'/tmp/{key.split("/")[-1]}'
+    file_name = key.split("/")[-1].split("_")[-1]
+    local_file_path = f'/tmp/{file_name}'
     
     excel_header = get_excel_header(key)
     
@@ -55,7 +56,7 @@ def lambda_handler(event, context):
 
     # Specify the S3 bucket and key where you want to save the modified JSON
     new_bucket = f"{bucket}-transformed"
-    new_key = key.replace("xlsx", "csv")
+    new_key = f'{file_name.split(".")[0]}{file_name.replace("xlsx", "csv")}'
 
     # Upload the modified JSON to S3
     s3_client.put_object(Bucket=new_bucket, Key=new_key, Body=csv_content)

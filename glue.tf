@@ -57,7 +57,7 @@ resource "aws_glue_job" "glue_data_transformation_job" {
   glue_version      = "3.0"
   number_of_workers = 2
   worker_type       = "G.1X"
-  max_retries       = "1"
+  max_retries       = "0"
   timeout           = 2880
 
   command {
