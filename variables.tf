@@ -29,23 +29,41 @@ variable "s3_bucket_landing" {
 variable "lambda" {
   description = "Lambda details"
   type = object({
-    source_file = string
-    function_name = string
-    handler = string
+    source_file         = string
+    function_name       = string
+    handler             = string
     lambda_zip_location = string
-    runtime = string
-    pandas = string
+    runtime             = string
+    pandas              = string
   })
 
   default = {
-    source_file = "lambdafunc.py"
-    function_name = "lambdafunc"
-    handler = "lambdafunc.lambda_handler"
+    source_file         = "lambdafunc.py"
+    function_name       = "lambdafunc"
+    handler             = "lambdafunc.lambda_handler"
     lambda_zip_location = "outputs/lambdafunc.zip"
-    runtime = "python3.10"
-    pandas = "pandas_layer.zip"
+    runtime             = "python3.10"
+    pandas              = "pandas_layer.zip"
   }
   
+}
+
+variable "lambda_apigateway" {
+  type = object({
+    source_file         = string
+    function_name       = string
+    handler             = string
+    lambda_zip_location = string
+    runtime             = string
+  })
+
+  default = {
+    source_file         = "apigateway.py"
+    function_name       = "apigateway"
+    handler             = "apigateway.get_csv"
+    lambda_zip_location = "outputs/apigateway.zip"
+    runtime             = "python3.10"
+  }
 }
 
 variable "file-name" {
@@ -72,8 +90,8 @@ variable "glue_jar" {
   })
   default = {
     folder_path = "glue-jar"
-    jdbc = "snowflake-jdbc-3.13.30.jar"
-    spark = "spark-snowflake_2.12-2.11.0-spark_3.1.jar"
+    jdbc        = "snowflake-jdbc-3.13.30.jar"
+    spark       = "spark-snowflake_2.12-2.11.0-spark_3.1.jar"
   }
 }
 
