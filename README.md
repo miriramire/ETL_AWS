@@ -20,7 +20,7 @@ After that, a `crawler` will explore the `.csv` data, and will get the schema to
 Then a `Glue ETL` will run a `spark` script to store the data in Snowflake, and will store a `.avro` in `Backup` Bucket.
 `Glue ETL` can get the snowflake credentials and basic details from `Secrets Manager`.
 
-![Diagram](Images/Globant_ETL.png)
+![Diagram](Images/ETL.png)
 
 ### For Challenge #2
 1. Number of employees hired for each job and department in 2021 divided by quarter. The table must be ordered alphabetically by department and job.
