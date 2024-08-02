@@ -83,6 +83,8 @@ HAVING COUNT(*) > (
 ORDER BY HIRED DESC;
 ```
 
+Please note that in order to get the results, they have been extracted to Excel, and they can be found in the folder called `Requierements`
+
 ### What can be improved?
 1. The `Lambda` can be changed to read `.xlsx` from `spark` directly
 2. Clean the data before upload it to `Snowflake`. There is a step in `spark` to `dropna` data, but it is not enough.
